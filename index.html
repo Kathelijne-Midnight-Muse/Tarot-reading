@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tarot Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 text-white min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-serif mb-2">✨ Daily Tarot Companion ✨</h1>
+            <p class="text-purple-200">Rider-Waite Deck Readings</p>
+        </header>
+
+        <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 mb-6">
+            <p class="text-sm mb-3">🔑 OpenAI API Key:</p>
+            <input id="apiKey" type="password" placeholder="sk-..." class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white mb-2">
+            <p class="text-xs text-purple-200">Get key at <a href="https://platform.openai.com/api-keys" target="_blank" class="underline">platform.openai.com</a></p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-serif mb-4">Select Three Cards</h2>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2">Card 1 (Past):</label>
+                <select id="card1" class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white">
+                    <option value="">Choose a card...</option>
+                    <optgroup label="Major Arcana">
+                        <option>The Fool</option>
+                        <option>The Magician</option>
+                        <option>The High Priestess</option>
+                        <option>The Empress</option>
+                        <option>The Emperor</option>
+                        <option>The Hierophant</option>
+                        <option>The Lovers</option>
+                        <option>The Chariot</option>
+                        <option>Strength</option>
+                        <option>The Hermit</option>
+                        <option>Wheel of Fortune</option>
+                        <option>Justice</option>
+                        <option>The Hanged Man</option>
+                        <option>Death</option>
+                        <option>Temperance</option>
+                        <option>The Devil</option>
+                        <option>The Tower</option>
+                        <option>The Star</option>
+                        <option>The Moon</option>
+                        <option>The Sun</option>
+                        <option>Judgement</option>
+                        <option>The World</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2">Card 2 (Present):</label>
+                <select id="card2" class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white">
+                    <option value="">Choose a card...</option>
+                    <optgroup label="Major Arcana">
+                        <option>The Fool</option>
+                        <option>The Magician</option>
+                        <option>The High Priestess</option>
+                        <option>The Empress</option>
+                        <option>The Emperor</option>
+                        <option>The Hierophant</option>
+                        <option>The Lovers</option>
+                        <option>The Chariot</option>
+                        <option>Strength</option>
+                        <option>The Hermit</option>
+                        <option>Wheel of Fortune</option>
+                        <option>Justice</option>
+                        <option>The Hanged Man</option>
+                        <option>Death</option>
+                        <option>Temperance</option>
+                        <option>The Devil</option>
+                        <option>The Tower</option>
+                        <option>The Star</option>
+                        <option>The Moon</option>
+                        <option>The Sun</option>
+                        <option>Judgement</option>
+                        <option>The World</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-2">Card 3 (Future):</label>
+                <select id="card3" class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white">
+                    <option value="">Choose a card...</option>
+                    <optgroup label="Major Arcana">
+                        <option>The Fool</option>
+                        <option>The Magician</option>
+                        <option>The High Priestess</option>
+                        <option>The Empress</option>
+                        <option>The Emperor</option>
+                        <option>The Hierophant</option>
+                        <option>The Lovers</option>
+                        <option>The Chariot</option>
+                        <option>Strength</option>
+                        <option>The Hermit</option>
+                        <option>Wheel of Fortune</option>
+                        <option>Justice</option>
+                        <option>The Hanged Man</option>
+                        <option>Death</option>
+                        <option>Temperance</option>
+                        <option>The Devil</option>
+                        <option>The Tower</option>
+                        <option>The Star</option>
+                        <option>The Moon</option>
+                        <option>The Sun</option>
+                        <option>Judgement</option>
+                        <option>The World</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <button onclick="getReading()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 py-3 rounded-lg font-semibold">
+                ✨ Generate Reading
+            </button>
+        </div>
+
+        <div id="result" class="hidden bg-white/10 rounded-lg p-6">
+            <h2 class="text-2xl font-serif mb-4">Your Reading</h2>
+            <div id="reading" class="text-purple-50 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto"></div>
+            <button onclick="document.getElementById('result').classList.add('hidden')" class="w-full mt-6 bg-white/10 hover:bg-white/20 py-3 rounded-lg font-semibold">
+                Back
+            </button>
+        </div>
+    </div>
+
+    <script>
+        async function getReading() {
+            const apiKey = document.getElementById('apiKey').value;
+            const card1 = document.getElementById('card1').value;
+            const card2 = document.getElementById('card2').value;
+            const card3 = document.getElementById('card3').value;
+
+            if (!apiKey) {
+                alert('Please enter your OpenAI API key');
+                return;
+            }
+
+            if (!card1 || !card2 || !card3) {
+                alert('Please select all three cards');
+                return;
+            }
+
+            const prompt = `You are a tarot reader. Give a reading for these three cards:
+1. ${card1} (Past)
+2. ${card2} (Present)
+3. ${card3} (Future)
+
+Provide a meaningful, personal reading about 300 words.`;
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 1000
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert('Error: ' + (data.error?.message || 'Unknown error'));
+                    return;
+                }
+
+                const reading = data.choices[0].message.content;
+                document.getElementById('reading').textContent = reading;
+                document.getElementById('result').classList.remove('hidden');
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
